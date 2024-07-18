@@ -1,15 +1,13 @@
-# Redbus_Data_Scrapping_with_Selenium-
+# Redbus Data Scrapping with Selenium
 Automating web browser interactions, to scrape data from the RedBus website. 
-
-# RedBus Data Scraping and Storage
 
 ## Overview
 
 This project involves scraping bus route and schedule data from the RedBus website using Selenium and Python. The scraped data is then processed, cleaned, and stored in MySQL database tables. Here's a breakdown of the project components and how to use them.
 
-## Requirements
+## Requirements 
 
-- Python 3.x
+- Python 3.12.3 
 - Selenium
 - pandas
 - MySQL Connector for Python
@@ -21,74 +19,36 @@ pip install selenium pandas mysql-connector-python
 ```
 
 ## Setup
-
-1. **WebDriver**: Download and place the Chrome WebDriver executable in your system's PATH or specify its location in the code.
    
-2. **MySQL Database**: Ensure you have MySQL installed and create a database named `Redbus_Project`. Adjust the database connection details (`host`, `user`, `password`) in the code as per your MySQL setup.
+1. **MySQL Database**: Ensure you have MySQL installed and create a database named `Redbus_Project`. Adjust the database connection details (`host`, `user`, `password`) in the code as per your MySQL setup.
 
-3. **Python Environment**: Set up a virtual environment (optional but recommended).
+2. **Python Environment**: Set up a virtual environment (optional but recommended).
 
 ## Running the Code
 
-1. **Collection**: `collection.py` scrapes data from the RedBus website:
+1. **Collection**: scrapes data from the RedBus website:
    - **get_into_rtc_wise**: Collects links to specific RTCs (Road Transport Corporations).
    - **get_bus_route_link_pagewise**: Collects route links for each RTC.
    - **get_bus_details_route_wise**: Scrapes detailed bus information for each route.
    
-   Execute `collection.py` to collect and save individual RTC-wise and route-wise CSV files.
+   Execute the collection cell to collect and save individual RTC-wise and route-wise CSV files.
 
-2. **Extraction & Cleaning**: `extraction_cleaning.py` cleans and combines scraped CSV data:
+2. **Extraction & Cleaning**: cleans and combines scraped CSV data:
    - **classify_bus**: Categorizes bus operators into Government or Private.
    - **classify_bus_type**: Categorizes bus types into Sleeper or Seater.
    - **classify_ac_type**: Categorizes bus types into AC or Non-AC.
    
-   Run `extraction_cleaning.py` to clean and merge RTC-specific CSV files into a consolidated `RedBus_Data.csv`.
+   Run the extraction_cleaning cell to clean and merge RTC-specific CSV files into a consolidated `RedBus_Data.csv`.
 
-3. **Storage**: `storage.py` establishes a connection to MySQL and inserts cleaned data:
+3. **Storage**: establishes a connection to MySQL and inserts cleaned data:
    - Creates a table `bus_routes` in the `Redbus_Project` database.
    - Inserts cleaned data from `RedBus_Data.csv` into MySQL.
 
-   Execute `storage.py` to create the database table and populate it with the cleaned data.
-
-## File Structure
-
-- **collection.py**: Collects data from RedBus.
-- **extraction_cleaning.py**: Cleans and combines collected data.
-- **storage.py**: Stores cleaned data into MySQL.
-- **RedBus_Data.csv**: Consolidated cleaned data file.
-- **README.md**: This file.
-
-## Troubleshooting
-
-- Ensure Chrome WebDriver is compatible with your Chrome browser version.
-- Check MySQL connection details (host, user, password) in `storage.py`.
-- Handle any web scraping issues related to page structure changes.
-
-## Authors
-
-- [Your Name](https://github.com/yourusername) - Initial work
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
----
-
-Adjust the URLs, paths, and specific details based on your implementation. This template provides a structured approach to documenting your project's functionality, setup instructions, and troubleshooting tips. Adjust the "Overview", "Running the Code", and "File Structure" sections to accurately reflect your project's organization and requirements.
-
+   Execute the storage cell to create the database table and populate it with the cleaned data.
 
 # RedBus Imitation Streamlit App
 
 This Streamlit application mimics the functionality of RedBus, allowing users to view and filter bus routes and details from various state transport corporations.
-
-## Table of Contents
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Features](#features)
-4. [File Structure](#file-structure)
-5. [Dependencies](#dependencies)
-6. [Contributing](#contributing)
-7. [License](#license)
 
 ## Installation
 
@@ -99,13 +59,9 @@ This Streamlit application mimics the functionality of RedBus, allowing users to
    cd redbus-imitation
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies & setup :**
 
-   Ensure you have Python 3.6+ installed. Install the required Python packages using pip:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
+   Install all the requirements as specified above.
 
 3. **Database Setup:**
 
