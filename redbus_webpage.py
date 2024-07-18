@@ -1,17 +1,22 @@
+# Import required libraries
 import pandas as pd
 import streamlit as st
 import mysql.connector
 
+# Establishes connection to MySQL
 connection = mysql.connector.connect(
     host = "localhost",
     user = "root",
     password = "MySql_Password",
     database = "Redbus_Project"
 )
-cursor = connection.cursor(dictionary=True)
+# creating cursor object where SQL queries are returned as dictionaries, where the keys are the column names
+cursor = connection.cursor(dictionary=True)     
 
+# list of RTC's
 rtc_items = ["KSRTC", "KTCL", "RSRTC", "HRTC", "ASTC", "PEPSU", "NBSTC", "BSRTC", "KAAC", "JKSRTC"]
 
+# Details of all RTC's
 rtc_item_details = {
     "KSRTC": """<b>കേരള സ്റ്റേറ്റ് റോഡ് ട്രാൻസ്പോർട്ട് കോർപ്പറേഷൻ</b><br>
                     Kerala State Road Transport Corporation<br>
@@ -55,6 +60,7 @@ rtc_item_details = {
                     <b>Services:</b> 16 services including Volvo Bus, AC & Non AC Bus and more"""
 }
 
+# Page Congfiguration 
 st.set_page_config(
     page_title="RedBus Imitation",
     layout='wide',
@@ -62,6 +68,7 @@ st.set_page_config(
     initial_sidebar_state='collapsed'
 )
 
+# Navigation Functions
 def next_item():
     st.session_state.index = (st.session_state.index + 1) % len(rtc_items)
 
@@ -70,15 +77,17 @@ def prev_item():
     if st.session_state.index < 0:
         st.session_state.index += len(rtc_items)
 
+# Page Header
 st.markdown("<h1 style='background-color:#EF7878;text-align:center;color:white;'>RedBus</h1>", unsafe_allow_html=True)
 
-
+# Session State Initialization
 if 'index' not in st.session_state:
     st.session_state.index = 0
 
 if 'selected_item' not in st.session_state:
     st.session_state.selected_item = None
 
+# Function to split time range
 def get_time_range_limits(time_range):
     if time_range == '6 AM to 12 PM':
         return '06:00:00', '12:00:00'
@@ -91,10 +100,12 @@ def get_time_range_limits(time_range):
     else:
         return '00:00:00', '23:59:59'
 
+# Creating list of items to display 
 start_index = st.session_state.index
 end_index = start_index + 3
 current_items = rtc_items[start_index:end_index] if end_index <= len(rtc_items) else rtc_items[start_index:] + rtc_items[:end_index - len(rtc_items)]
 
+# Displaying RTC's
 with st.container():
     st.subheader('Available State Transport Buses:')
     col1, col2, col3 = st.columns(3)
@@ -107,6 +118,7 @@ with st.container():
                 if view_buses_button:
                     st.session_state.selected_item = item
 
+    # Navigation through RTC's
     col1, col2, col3 = st.columns(3)
     with col2:
         if start_index > 0:
@@ -115,9 +127,11 @@ with st.container():
         if st.button('Next >', use_container_width=True):
             next_item()
 
+# After selecting RTC - displaying the routes & buses with filters
 if st.session_state.selected_item:
     selected_rtc = st.session_state.selected_item
     st.subheader(f"Routes for {selected_rtc}")
+    # Query to collect the routes of the RTC selected
     cursor.execute("""
     SELECT 
         Bus_Route_Name,
@@ -133,8 +147,10 @@ if st.session_state.selected_item:
     
     route_data = cursor.fetchall()
 
+    # Converts the data as DataFrame
     df_routes = pd.DataFrame(route_data)
     
+    # loops through each route & displays required data of each route
     for index, row in df_routes.iterrows():
         with st.container(border=True):
             st.subheader(f'{row["Bus_Route_Name"]}')
@@ -149,14 +165,16 @@ if st.session_state.selected_item:
                 st.write(f'Last Bus: {last_bus_time}')
             with col4:
                 view_buses = st.checkbox('View Buses', key=f'{row["Bus_Route_Name"]}')
-
+            
+            # after clicking the view buses - displayes the bus data
             if view_buses:
-                
+                # Query to collect bus details of each route
                 sql_query = """SELECT Bus_Name, Bus_Type, Departing_Time, Reaching_Time, Duration, Availability, Star_Rating, Price, Boarding_Points, Reaching_Points, Amenities
                 FROM bus_routes 
                 WHERE RTC_Name = %s 
                 AND Bus_Route_Name = %s"""
 
+                # Filters
                 st.sidebar.title("Filter by")
 
                 time_ranges = ['All', '6 AM to 12 PM', '12 PM to 6 PM', '6 PM to 12 AM', '12 AM to 6 AM']
@@ -193,8 +211,10 @@ if st.session_state.selected_item:
                         filters.append(f"Operator_Type = '{selected_operator_type}'")
 
                 if filters:
+                    # Updating the query to include the filters
                     sql_query += " AND " + " AND ".join(filters)
 
+                # sort
                 st.sidebar.title("Sort by")
 
                 sort_options = ['None', 'Price - High to Low', 'Price - Low to High', 'Best Rating First', 'Early Departure', 'Late Departure', 'Early Arrival', 'Late Arrival']
@@ -225,29 +245,36 @@ if st.session_state.selected_item:
 
                 sort_clauses = [clause for clause in [sort_by_price, sort_by_rating, sort_by_departing_time, sort_by_reaching_time] if clause]
                 if sort_clauses:
+                    # updating query to include sorts
                     sql_query += " ORDER BY " + ", ".join(sort_clauses)
 
-
-                st.write(sql_query)
+                # Executes the query after filters & sorts
                 cursor.execute(sql_query, (st.session_state.selected_item, row["Bus_Route_Name"]))
                 detailed_data = cursor.fetchall()
                 df_detailed = pd.DataFrame(detailed_data)
 
+                # Amenities Filter
                 st.sidebar.title("Filter by Amenities")
 
                 df_detailed['Amenities'] = df_detailed['Amenities'].apply(lambda x: x.split(', ') if pd.notna(x) else [])
                 unique_amenities = set(amenity for sublist in df_detailed['Amenities'] for amenity in sublist)
                 unique_amenities = list(unique_amenities)
                 selected_amenities = st.sidebar.multiselect("Select Amenities", unique_amenities)
+
                 if selected_amenities:
                     df_detailed = df_detailed[df_detailed['Amenities'].apply(lambda x: any(item in selected_amenities for item in x))]
                 
                 if df_detailed.empty:
                     st.warning("No buses found for the selected filters.")
-                else:                   
-                    df_detailed['Departing_Time'] = df_detailed['Departing_Time'].dt.time
-                    df_detailed['Reaching_Time'] = df_detailed['Reaching_Time'].dt.time
-                    df_detailed['Boarding_Points'] = df_detailed['Boarding_Points'].apply(lambda x: x.split(', ') if pd.notna(x) else [])
-                    df_detailed['Reaching_Points'] = df_detailed['Reaching_Points'].apply(lambda x: x.split(', ') if pd.notna(x) else [])
+                else:
+                    try: 
+                        # taking only the time
+                        df_detailed['Departing_Time'] = df_detailed['Departing_Time'].dt.time   
+                        df_detailed['Reaching_Time'] = df_detailed['Reaching_Time'].dt.time
+                        # spliting the points with ','
+                        df_detailed['Boarding_Points'] = df_detailed['Boarding_Points'].apply(lambda x: x.split(', ') if pd.notna(x) else [])  
+                        df_detailed['Reaching_Points'] = df_detailed['Reaching_Points'].apply(lambda x: x.split(', ') if pd.notna(x) else [])
 
-                    st.dataframe(df_detailed)
+                        st.dataframe(df_detailed)
+                    except Exception:
+                        st.warning("No buses found for the selected filters.")
