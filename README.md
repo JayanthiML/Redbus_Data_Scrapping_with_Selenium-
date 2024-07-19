@@ -1,9 +1,17 @@
-# Redbus Data Scrapping with Selenium
-Automating web browser interactions, to scrape data from the RedBus website. 
+# Redbus Data Scraping and Filtering with Streamlit Application
+## Project Overview
+Aims to revolutionize the transportation industry by providing a comprehensive solution for collecting, analyzing, and visualizing bus travel data. 
+By utilizing **Selenium** for web scraping, this project automates web browser interactions, the extraction of detailed information from Redbus, including bus routes, schedules, prices, and seat availability
+By streamlining data collection and providing powerful tools for data-driven decision-making, this project can significantly improve operational efficiency and strategic planning in the
+transportation industry.
 
-## Overview
+This project involves 
+   - Scraping bus route and schedule data from the RedBus website using Selenium and Python.
+   - The scraped data is then processed, cleaned, and stored in MySQL database tables.
+   - Create a web application that allow users to browse and filter bus routes and schedules for various state transport corporations (RTCs) in India.
 
-This project involves scraping bus route and schedule data from the RedBus website using Selenium and Python. The scraped data is then processed, cleaned, and stored in MySQL database tables. Here's a breakdown of the project components and how to use them.
+The project leverages Python, Streamlit, and MySQL to achieve this.
+Here's a breakdown of the project components and how to use them.
 
 ## Requirements 
 
